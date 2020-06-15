@@ -20,7 +20,13 @@ public class Tile : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        transform.GetComponent<Renderer>().material.color = Color.blue;
+        if (GameManager.instance.players[GameManager.instance.currentPlayerIndex].moving)
+        {
+            transform.GetComponent<Renderer>().material.color = Color.blue;
+        } else if (GameManager.instance.players[GameManager.instance.currentPlayerIndex].attacking)
+        {
+            transform.GetComponent<Renderer>().material.color = Color.red;
+        }
     }
 
     private void OnMouseExit()
@@ -30,6 +36,13 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
-        GameManager.instance.moveCurrentPlayer(this);
+        if (GameManager.instance.players[GameManager.instance.currentPlayerIndex].moving)
+        {
+            GameManager.instance.moveCurrentPlayer(this);
+        }
+        else if (GameManager.instance.players[GameManager.instance.currentPlayerIndex].attacking)
+        {
+            GameManager.instance.attackWithCurrentPlayer(this);
+        }
     }
 }
