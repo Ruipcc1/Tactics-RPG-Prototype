@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 981301587466259454}
   - component: {fileID: 7424388292257241426}
   - component: {fileID: 3290601991609992355}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: UserPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,3 +108,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2a42c0e9a5d91e4d93d220a7ffdfd05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridPosition: {x: 0, y: 0}
+  moveDestination: {x: 0, y: 1, z: 5}
+  moveSpeed: 10
+  moving: 0
+  attacking: 0
+  playerName: Heyward
+  HP: 25
+  attackChance: 0.75
+  defenseReduction: 0.15
+  damageBase: 5
+  moveDistance: 5
+  attackRange: 1
+  damageRollSides: 6
+  actionPoints: 2
+  positionQueue: []
+  unitRange: 0

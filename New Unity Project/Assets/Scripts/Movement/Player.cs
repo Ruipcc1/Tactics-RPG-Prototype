@@ -18,9 +18,14 @@ public class Player : MonoBehaviour
     public float attackChance = 0.75f;
     public float defenseReduction = 0.15f;
     public int damageBase = 5;
+    public int moveDistance = 5;
+    public int attackRange = 1;
     public int damageRollSides = 6; //d6
 
     public int actionPoints = 2;
+
+
+    public List<Vector3> positionQueue = new List<Vector3>();
 
     void Awake()
     {

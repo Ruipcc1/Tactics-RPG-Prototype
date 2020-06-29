@@ -64,7 +64,10 @@
     <Compile Include="Assets\Scripts\Movement\AIMovement.cs" />
     <Compile Include="Assets\Scripts\Movement\Player.cs" />
     <Compile Include="Assets\Scripts\Movement\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\Tile.cs" />
+    <Compile Include="Assets\Scripts\Tiles\Pathfinder.cs" />
+    <Compile Include="Assets\Scripts\Tiles\Tile.cs" />
+    <Compile Include="Assets\Scripts\Tiles\TileHighlight.cs" />
+    <Compile Include="Assets\Scripts\Tiles\TilePath.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Unity.Timeline.Editor">

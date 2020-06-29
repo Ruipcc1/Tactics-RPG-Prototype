@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class PlayerMovement : Player
 {
-    public State state;
-
-    public enum State {
-        Normal, AfterDamage
-    }
+    public int unitRange;
 
     // Start is called before the first frame update
     void Start()
     {
-        state = State.Normal;
+        unitRange = moveDistance;
     }
 
     // Update is called once per frame
@@ -36,13 +32,22 @@ public class PlayerMovement : Player
 
     public override void TurnUpdate()
     {
-        if (Vector3.Distance(moveDestination, transform.position) > 0.1f)
+        if (positionQueue.Count > 0)
         {
-            transform.position += (moveDestination - transform.position).normalized * moveSpeed * Time.deltaTime;
-            if (Vector3.Distance(moveDestination, transform.position) <= 0.1f)
+            if (Vector3.Distance(positionQueue[0], transform.position) > 0.1f)
             {
-                transform.position = moveDestination;
-                actionPoints--;
+                transform.position += (positionQueue[0] - transform.position).normalized * moveSpeed * Time.deltaTime;
+                if (Vector3.Distance(positionQueue[0], transform.position) <= 0.1f)
+                {
+                    transform.position = positionQueue[0];
+                    positionQueue.RemoveAt(0);
+                    if (positionQueue.Count == 0)
+                    {
+                        actionPoints--;
+                        Tile.movable = true;
+                        GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance);
+                    }
+                }
             }
         }
         transform.GetComponent<Renderer>().material.color = Color.green;
@@ -58,6 +63,7 @@ public class PlayerMovement : Player
             {
                 moving = true;
                 attacking = false;
+                GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance);
             }
             else
             {
@@ -70,14 +76,17 @@ public class PlayerMovement : Player
         if (GUI.Button(buttonRect, "Attack")) {
             if (!attacking)
             {
+                GameManager.instance.removeHighlights();
                 moving = false;
                 attacking = true;
+                GameManager.instance.highlightTilesAt(gridPosition, Color.red, attackRange);
             }
             else {
                 moving = false;
                 attacking = false;
+                GameManager.instance.removeHighlights();
             }
-            state = State.AfterDamage;
+
         }
 
         buttonRect = new Rect(0, Screen.height - buttonHeight * 1, buttonWidth, buttonHeight);

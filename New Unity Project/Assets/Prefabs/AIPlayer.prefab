@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 981301587466259454}
   - component: {fileID: 7424388292257241426}
   - component: {fileID: -3269636893495624355}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: AIPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,5 +108,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae52e28a4d57bde45a75112a82019c57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridPosition: {x: 0, y: 0}
   moveDestination: {x: 0, y: 0, z: 0}
   moveSpeed: 10
+  moving: 0
+  attacking: 0
+  playerName: George
+  HP: 25
+  attackChance: 0.75
+  defenseReduction: 0.15
+  damageBase: 5
+  damageRollSides: 6
+  actionPoints: 2

@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     public int mapSize = 11;
 
-    List<List<Tile>> map = new List<List<Tile>>();
+    public List<List<Tile>> map = new List<List<Tile>>();
     public List<Player> players = new List<Player>();
 
     public int currentPlayerIndex = 0;
@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
 
     public void nextTurn()
     {
+        removeHighlights();
         if (currentPlayerIndex + 1 < players.Count)
         {
             currentPlayerIndex++;
@@ -57,52 +58,93 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void highlightTilesAt(Vector2 originLocation, Color highlightColor, int range)
+    {
+        List<Tile> highlightedTiles = TileHighlight.FindHighlight(map[(int)originLocation.x][(int)originLocation.y], range);
+        foreach (Tile t in highlightedTiles)
+        {
+            t.transform.GetComponent<Renderer>().material.color = highlightColor;
+        }
+    }
+
+    public void removeHighlights()
+    {
+        for (int i =0; i < mapSize; i++)
+        {
+            for (int j = 0; j < mapSize; j++)
+            {
+                if (!map[i][j].impassible) map[i][j].transform.GetComponent<Renderer>().material.color = Color.white;
+            }
+        }
+    }
+
     public void moveCurrentPlayer(Tile destTile)
     {
-        players[currentPlayerIndex].gridPosition = destTile.gridPosition;
-        players[currentPlayerIndex].moveDestination = destTile.transform.position + 1.5f * Vector3.up;
+        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white)
+        {
+            Tile.movable = false;
+            removeHighlights();
+            foreach (Tile t in Pathfinder.FindPath(map[(int)players[currentPlayerIndex].gridPosition.x][(int)players[currentPlayerIndex].gridPosition.y], destTile))
+            {
+                players[currentPlayerIndex].positionQueue.Add(map[(int)t.gridPosition.x][(int)t.gridPosition.y].transform.position + 1.5f * Vector3.up);
+                Debug.Log("(" + players[currentPlayerIndex].positionQueue[players[currentPlayerIndex].positionQueue.Count - 1].x + "," + players[currentPlayerIndex].positionQueue[players[currentPlayerIndex].positionQueue.Count - 1].y + ")");
+            }
+            players[currentPlayerIndex].gridPosition = destTile.gridPosition;
+        }
+        else
+        {
+            Debug.Log("destination invalid");
+        }
     }
+    
 
     public void attackWithCurrentPlayer(Tile destTile)
     {
-        Player target = null;
-        foreach (Player p in players)
+        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white)
         {
-            if (p.gridPosition == destTile.gridPosition)
+            Player target = null;
+            foreach (Player p in players)
             {
-                target = p;
-            }
-        }
-
-        if (target != null)
-        {
-            if (players[currentPlayerIndex].gridPosition.x >= target.gridPosition.x - 1 && players[currentPlayerIndex].gridPosition.x <= target.gridPosition.x + 1 && 
-                players[currentPlayerIndex].gridPosition.y >= target.gridPosition.y - 1 && players[currentPlayerIndex].gridPosition.y <= target.gridPosition.y + 1)
-            {
-                players[currentPlayerIndex].actionPoints--;
-                bool hit = Random.Range(0.0f, 1.0f) <= players[currentPlayerIndex].attackChance;
-                if (hit)
+                if (p.gridPosition == destTile.gridPosition)
                 {
-                    int amountofDamage = players[currentPlayerIndex].damageBase + Random.Range(0, players[currentPlayerIndex].damageRollSides);
+                    target = p;
+                }
+            }
 
-                    target.HP -= amountofDamage;
-                    Debug.Log(players[currentPlayerIndex].playerName + "hit" + target.playerName + "for" + amountofDamage);
+
+            if (target != null)
+            {
+                if (players[currentPlayerIndex].gridPosition.x >= target.gridPosition.x - 1 && players[currentPlayerIndex].gridPosition.x <= target.gridPosition.x + 1 &&
+                    players[currentPlayerIndex].gridPosition.y >= target.gridPosition.y - 1 && players[currentPlayerIndex].gridPosition.y <= target.gridPosition.y + 1)
+                {
+                    players[currentPlayerIndex].actionPoints--;
+                    bool hit = Random.Range(0.0f, 1.0f) <= players[currentPlayerIndex].attackChance;
+                    if (hit)
+                    {
+                        int amountofDamage = players[currentPlayerIndex].damageBase + Random.Range(0, players[currentPlayerIndex].damageRollSides);
+
+                        target.HP -= amountofDamage;
+                        Debug.Log(players[currentPlayerIndex].playerName + "hit" + target.playerName + "for" + amountofDamage);
+                    }
+                    else
+                    {
+                        Debug.Log(players[currentPlayerIndex].playerName + "missed" + target.playerName);
+                    }
                 }
                 else
                 {
-                    Debug.Log(players[currentPlayerIndex].playerName + "missed" + target.playerName);
+                    Debug.Log("No Target");
                 }
             }
             else
             {
-                Debug.Log("No Target");
+                Debug.Log("destination invalid now");
             }
         }
     }
 
     void generateMap()
     {
-        map = new List<List<Tile>>();
         for (int i = 0; i < mapSize; i++)
         {
             List<Tile> row = new List<Tile>();
