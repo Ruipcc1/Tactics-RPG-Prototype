@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public List<Player> players = new List<Player>();
 
     public int currentPlayerIndex = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -58,9 +59,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void highlightTilesAt(Vector2 originLocation, Color highlightColor, int range)
+    public void highlightTilesAt(Vector2 originLocation, Color highlightColor, int range, bool ignorePlayers = true)
     {
-        List<Tile> highlightedTiles = TileHighlight.FindHighlight(map[(int)originLocation.x][(int)originLocation.y], range);
+        List<Tile> highlightedTiles = new List<Tile>();
+        if (ignorePlayers) highlightedTiles = TileHighlight.FindHighlight(map[(int)originLocation.x][(int)originLocation.y], range);
+        else {
+            highlightedTiles = TileHighlight.FindHighlight(map[(int)originLocation.x][(int)originLocation.y], range, players.Where(x => x.gridPosition != originLocation).Select(x => x.gridPosition).ToArray());
+        }
         foreach (Tile t in highlightedTiles)
         {
             t.transform.GetComponent<Renderer>().material.color = highlightColor;
@@ -80,11 +85,10 @@ public class GameManager : MonoBehaviour
 
     public void moveCurrentPlayer(Tile destTile)
     {
-        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white)
-        {
+        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white && !destTile.impassible && players[currentPlayerIndex].positionQueue.Count == 0) {
             Tile.movable = false;
             removeHighlights();
-            foreach (Tile t in Pathfinder.FindPath(map[(int)players[currentPlayerIndex].gridPosition.x][(int)players[currentPlayerIndex].gridPosition.y], destTile))
+            foreach (Tile t in Pathfinder.FindPath(map[(int)players[currentPlayerIndex].gridPosition.x][(int)players[currentPlayerIndex].gridPosition.y], destTile, players.Where(x => x.gridPosition != destTile.gridPosition && x.gridPosition != players[currentPlayerIndex].gridPosition).Select(x => x.gridPosition).ToArray()))
             {
                 players[currentPlayerIndex].positionQueue.Add(map[(int)t.gridPosition.x][(int)t.gridPosition.y].transform.position + 1.5f * Vector3.up);
                 Debug.Log("(" + players[currentPlayerIndex].positionQueue[players[currentPlayerIndex].positionQueue.Count - 1].x + "," + players[currentPlayerIndex].positionQueue[players[currentPlayerIndex].positionQueue.Count - 1].y + ")");
@@ -100,7 +104,7 @@ public class GameManager : MonoBehaviour
 
     public void attackWithCurrentPlayer(Tile destTile)
     {
-        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white)
+        if (destTile.transform.GetComponent<Renderer>().material.color != Color.white && !destTile.impassible)
         {
             Player target = null;
             foreach (Player p in players)
@@ -177,6 +181,11 @@ public class GameManager : MonoBehaviour
         player.gridPosition = new Vector2(4, 4);
         player.playerName = "Chas";
         players.Add(player);
+
+        aiplayer = GameObject.Instantiate(AiPlayerPrefab, new Vector3(5 - Mathf.Floor(mapSize / 2), 1.5f, -4 + Mathf.Floor(mapSize / 2)), Quaternion.Euler(new Vector3())).GetComponent<AIMovement>();
+        aiplayer.gridPosition = new Vector2(5, 4);
+        aiplayer.playerName = "Planshy";
+        players.Add(aiplayer);
     }
 }
 

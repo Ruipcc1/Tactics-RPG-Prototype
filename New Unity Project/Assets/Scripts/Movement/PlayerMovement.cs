@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class PlayerMovement : Player
 {
-    public int unitRange;
 
     // Start is called before the first frame update
     void Start()
     {
-        unitRange = moveDistance;
+
     }
 
     // Update is called once per frame
@@ -19,14 +18,6 @@ public class PlayerMovement : Player
         {
             transform.rotation = Quaternion.Euler(new Vector3(90, 0 ,0));
             transform.GetComponent<Renderer>().material.color = Color.red;
-        }
-        if(actionPoints == 0)
-        {
-            actionPoints = 2;
-            moving = false;
-            attacking = false;
-            transform.GetComponent<Renderer>().material.color = Color.white;
-            GameManager.instance.nextTurn();
         }
     }
 
@@ -45,12 +36,13 @@ public class PlayerMovement : Player
                     {
                         actionPoints--;
                         Tile.movable = true;
-                        GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance);
+                        GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance, false);
                     }
                 }
             }
         }
         transform.GetComponent<Renderer>().material.color = Color.green;
+        base.TurnUpdate();
     }
     public override void TurnOnGUI()
     {
@@ -63,7 +55,7 @@ public class PlayerMovement : Player
             {
                 moving = true;
                 attacking = false;
-                GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance);
+                GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance, false);
             }
             else
             {

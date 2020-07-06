@@ -50,6 +50,7 @@ public class Player : MonoBehaviour
             actionPoints = 2;
             moving = false;
             attacking = false;
+            GameManager.instance.players[GameManager.instance.currentPlayerIndex].transform.GetComponent<Renderer>().material.color = Color.white;
             GameManager.instance.nextTurn();
         }
     }
