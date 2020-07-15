@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+
+    public Sprite portrait;
+
     public Vector2 gridPosition = Vector2.zero;
 
-    public Vector3 moveDestination;
     public float moveSpeed = 10.0f;
 
     public bool moving = false;
@@ -14,6 +17,7 @@ public class Player : MonoBehaviour
 
     public string playerName = "George";
     public int HP = 25;
+    public int currentHP = 25;
 
     public float attackChance = 0.75f;
     public float defenseReduction = 0.15f;
@@ -24,13 +28,13 @@ public class Player : MonoBehaviour
 
     public int actionPoints = 2;
 
+    public int playerNumber;
+
+    
+
 
     public List<Vector3> positionQueue = new List<Vector3>();
 
-    void Awake()
-    {
-        moveDestination = transform.position;
-    }
     // Start is called before the first frame update
     void Start()
     {

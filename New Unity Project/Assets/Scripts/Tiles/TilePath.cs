@@ -23,6 +23,14 @@ public class TilePath
     public void addTile(Tile t)
     {
         costOfPath += t.movementCost;
+
+        listOfTiles.Add(t);
+        lastTile = t;
+    }
+
+    public void addTileAttack(Tile t)
+    {
+        costOfPath += 1;
         listOfTiles.Add(t);
         lastTile = t;
     }

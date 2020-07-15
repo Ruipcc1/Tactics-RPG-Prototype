@@ -8,13 +8,17 @@ public class AIMovement : Player
     // Start is called before the first frame update
     void Start()
     {
-
+        currentHP = 25;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (currentHP <= 0)
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+            transform.GetComponent<Renderer>().material.color = Color.red;
+        }
     }
 
     public override void TurnUpdate()
@@ -32,6 +36,7 @@ public class AIMovement : Player
                     if (positionQueue.Count == 0)
                     {
                         actionPoints--;
+                        Tile.movable = true;
                         GameManager.instance.highlightTilesAt(gridPosition, Color.blue, moveDistance, false);
                     }
                 }
@@ -45,10 +50,10 @@ public class AIMovement : Player
             //List<Tile> movementToAttackTilesInRange = TileHighlight.FindHighlight(GameManager.instance.map[(int)gridPosition.x][(int)gridPosition.y], movementPerActionPoint + attackRange);
             List<Tile> movementTilesInRange = TileHighlight.FindHighlight(GameManager.instance.map[(int)gridPosition.x][(int)gridPosition.y], moveDistance + 1000);
             //attack if in range and with lowest HP
-            if (attacktilesInRange.Where(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.HP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0).Count() > 0)
+            if (attacktilesInRange.Where(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.currentHP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0).Count() > 0)
             {
-                var opponentsInRange = attacktilesInRange.Select(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.HP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0 ? GameManager.instance.players.Where(y => y.gridPosition == x.gridPosition).First() : null).ToList();
-                Player opponent = opponentsInRange.OrderBy(x => x != null ? -x.HP : 1000).First();
+                var opponentsInRange = attacktilesInRange.Select(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.currentHP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0 ? GameManager.instance.players.Where(y => y.gridPosition == x.gridPosition).First() : null).ToList();
+                Player opponent = opponentsInRange.OrderBy(x => x != null ? -x.currentHP : 1000).First();
 
                 GameManager.instance.removeHighlights();
                 moving = false;
@@ -58,10 +63,10 @@ public class AIMovement : Player
                 GameManager.instance.attackWithCurrentPlayer(GameManager.instance.map[(int)opponent.gridPosition.x][(int)opponent.gridPosition.y]);
             }
             //move towards nearest opponent
-            else if (movementTilesInRange.Where(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.HP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0).Count() > 0)
+            else if (movementTilesInRange.Where(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.currentHP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0).Count() > 0)
             {
-                var opponentsInRange = movementTilesInRange.Select(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.HP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0 ? GameManager.instance.players.Where(y => y.gridPosition == x.gridPosition).First() : null).ToList();
-                Player opponent = opponentsInRange.OrderBy(x => x != null ? -x.HP : 1000).ThenBy(x => x != null ? Pathfinder.FindPath(GameManager.instance.map[(int)gridPosition.x][(int)gridPosition.y], GameManager.instance.map[(int)x.gridPosition.x][(int)x.gridPosition.y]).Count() : 1000).First();
+                var opponentsInRange = movementTilesInRange.Select(x => GameManager.instance.players.Where(y => y.GetType() != typeof(AIMovement) && y.currentHP > 0 && y != this && y.gridPosition == x.gridPosition).Count() > 0 ? GameManager.instance.players.Where(y => y.gridPosition == x.gridPosition).First() : null).ToList();
+                Player opponent = opponentsInRange.OrderBy(x => x != null ? -x.currentHP : 1000).ThenBy(x => x != null ? Pathfinder.FindPath(GameManager.instance.map[(int)gridPosition.x][(int)gridPosition.y], GameManager.instance.map[(int)x.gridPosition.x][(int)x.gridPosition.y]).Count() : 1000).First();
 
                 GameManager.instance.removeHighlights();
                 moving = true;

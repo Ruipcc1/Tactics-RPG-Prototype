@@ -12,16 +12,27 @@ public class TileHighlight
     
     public static List<Tile> FindHighlight(Tile originTile, int movementPoints)
     {
-        return FindHighlight(originTile, movementPoints, new Vector2[0]);
+        return FindHighlight(originTile, movementPoints, new Vector2[0], true);
+    }
+    public static List<Tile> FindHighlight(Tile originTile, int movementPoints, Vector2[] occupiedTile)
+    {
+        return FindHighlight(originTile, movementPoints, occupiedTile, false);
     }
 
-    public static List<Tile> FindHighlight(Tile originTile, int movementPoints, Vector2[] occupiedTile)
+    public static List<Tile> FindHighlight(Tile originTile, int movementPoints, Vector2[] occupiedTile, bool attacking)
     {
         List<Tile> closed = new List<Tile>();
         List<TilePath> open = new List<TilePath>();
 
         TilePath originPath = new TilePath();
-        originPath.addTile(originTile);
+        if (attacking)
+        {
+            originPath.addTileAttack(originTile);
+        }
+        else
+        {
+            originPath.addTile(originTile);
+        }
 
         open.Add(originPath);
 
@@ -45,11 +56,20 @@ public class TileHighlight
             {
                 if (t.impassible || occupiedTile.Contains(t.gridPosition)) continue;
                 TilePath newTilePath = new TilePath(current);
-                newTilePath.addTile(t);
-                open.Add(newTilePath);
+                if (attacking)
+                {
+                    newTilePath.addTileAttack(t);
+                    open.Add(newTilePath);
+                }
+                else
+                {
+                    newTilePath.addTile(t);
+                    open.Add(newTilePath);
+                }
             }
         }
         closed.Remove(originTile);
+        closed.Distinct();
         return closed;
     }
 }

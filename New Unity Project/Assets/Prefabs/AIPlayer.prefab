@@ -115,8 +115,12 @@ MonoBehaviour:
   attacking: 0
   playerName: George
   HP: 25
+  currentHP: 25
   attackChance: 0.75
   defenseReduction: 0.15
   damageBase: 5
+  moveDistance: 5
+  attackRange: 1
   damageRollSides: 6
   actionPoints: 2
+  positionQueue: []
